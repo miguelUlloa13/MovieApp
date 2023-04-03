@@ -6,8 +6,10 @@
 //
 
 import UIKit
+import FirebaseCore
 import FirebaseAnalytics
 import FirebaseAuth
+import GoogleSignIn
 
 class LogInViewController: UIViewController {
     
@@ -21,6 +23,9 @@ class LogInViewController: UIViewController {
     @IBOutlet weak var UsrPassView: UIView!
     @IBOutlet weak var RememberPassView: UIView!
     @IBOutlet weak var SignUpView: UIView!
+    @IBOutlet weak var OrView: UIView!
+    @IBOutlet weak var LeftGrayLineView: UIView!
+    @IBOutlet weak var RightGrayLineView: UIView!
     
     // Stack View
     @IBOutlet weak var LogInSV: UIStackView!
@@ -37,6 +42,7 @@ class LogInViewController: UIViewController {
     @IBOutlet weak var SignUpLbl: UILabel!
     @IBOutlet weak var UsrNameLbl: UILabel!
     @IBOutlet weak var UsrPassLbl: UILabel!
+    @IBOutlet weak var OrLbl: UILabel!
     
     // Text Fields
     @IBOutlet weak var UsrNameTF: UITextField!
@@ -47,6 +53,8 @@ class LogInViewController: UIViewController {
     @IBOutlet weak var RememberPassBtn: UIButton!
     @IBOutlet weak var LogInBtn: UIButton!
     @IBOutlet weak var SignUpBtn: UIButton!
+    @IBOutlet weak var SignUpGoogleBtn: UIButton!
+    
     
     // MARK: - Properties
 
@@ -61,13 +69,26 @@ class LogInViewController: UIViewController {
         UsrPassTF.delegate = self
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
         
-        // RememberPassView.isHidden = true
+        // Comprobar la session del usuario autenticado
+        checkUserSession()
         
-        
+        // Personalizacion de views
         setUpLabels()
         setUpViews()
         setUpTextFields()
         setUpButtons()
+        
+
+        let viewModel: ViewModel = ViewModel()
+        viewModel.getMovies()
+
+        
+
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        FormView.isHidden = false
     }
     
     // MARK: - Methods
@@ -76,9 +97,10 @@ class LogInViewController: UIViewController {
     private func setUpLabels() {
         AppFontModel(label: LogInLbl, text: "Log In").applyChanges(size: 20 ,textAlignment: .left)
         AppFontModel(label: RememberPassLbl, text: "Stay signed in").applyChanges(textAlignment: .left)
-        AppFontModel(label: SignUpLbl, text: "Don't have account?").applyChanges()
+        AppFontModel(label: SignUpLbl, text: "Don't have an account yet?").applyChanges()
         AppFontModel(label: UsrNameLbl, text: "Email address or username").applyChanges(textAlignment: .left)
         AppFontModel(label: UsrPassLbl, text: "Password").applyChanges(textAlignment: .left)
+        AppFontModel(label: OrLbl, text: "Or").applyChanges(textColor: .darkGray)
     }
     
         // Metodo para personalizar los views
@@ -133,27 +155,88 @@ class LogInViewController: UIViewController {
         SignUpBtn.titleLabel?.font = .Futura(size: 17)
         SignUpBtn.titleLabel?.adjustsFontSizeToFitWidth = true
         SignUpBtn.titleLabel?.minimumScaleFactor = 0.5
+        
+        SignUpGoogleBtn.setTitle("Log in using Google", for: .normal)
+        SignUpGoogleBtn.titleLabel?.font = .Futura(size: 17)
+        SignUpGoogleBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+        SignUpGoogleBtn.titleLabel?.minimumScaleFactor = 0.5
+        SignUpGoogleBtn.layer.borderWidth = 1
+        SignUpGoogleBtn.layer.borderColor = UIColor.black.cgColor
+        SignUpGoogleBtn.round()
+    }
+    
+    // Pasar al view controller Home
+    
+    private func showHome(result: AuthDataResult?, error: Error?, provider: ProviderType) {
+        
+        if let result = result, error == nil {
+            // Bloque si el resultado es distinto de nulo y error es nulo, se registro correctamente el usuario
+            self.navigationController?.pushViewController(HomeViewController(email: result.user.email!, provider: provider), animated: true)
+            self.view.endEditing(true)
+        } else {
+            
+            // Bloque si no se hizo el registro correctamente
+            AlertModel().simpleAlert(vc: self, title: "Error", message: "Se ha producido un error de autenticacion de usuario mediante \(provider.rawValue)")
+        }
+        
+    }
+    
+    // Comprobar la sesion del usuario autenticado
+    func checkUserSession() {
+        let defaults = UserDefaults.standard
+        if let email = defaults.value(forKey: "email") as? String, let provider = defaults.value(forKey: "provider") as? String {
+            FormView.isHidden = true
+            navigationController?.pushViewController(HomeViewController.init(email: email, provider: ProviderType.init(rawValue: provider)!), animated: true)
+        }
+    }
+    
+    // Log in y Sign up con google
+    func signInGoogle() {
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+
+        // Create Google Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        // Start the sign in flow!
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [unowned self] result, error in
+          guard error == nil else {
+              fatalError("Error")
+          }
+
+          guard let user = result?.user,
+            let idToken = user.idToken?.tokenString
+          else {
+            fatalError("Error")
+          }
+
+          let credential = GoogleAuthProvider.credential(withIDToken: idToken,
+                                                         accessToken: user.accessToken.tokenString)
+            
+            Auth.auth().signIn(with: credential) {result,error in
+                self.showHome(result: result, error: error, provider: .google)
+            }
+            
+        }
     }
     
     // MARK: - Method Actions
         // Action para Logearse en la app
     @IBAction func LogInBtnAction(_ sender: UIButton) {
         if let usrName = UsrNameTF.text, let usrPass = UsrPassTF.text {
+            
+                // Metodo para registrar el email y la contraseña en firebase
             Auth.auth().signIn(withEmail: usrName, password: usrPass) {result,error in
-                
-                    
-                if let result = result, error == nil {
-                    // Bloque si el resultado es distinto de nulo y error es nulo, se registro correctamente el usuario
-                    self.navigationController?.pushViewController(HomeViewController(email: result.user.email!, provider: .basic), animated: true)
-                    self.view.endEditing(true)
-                } else {
-                    
-                    // Bloque si no se hizo el registro correctamente
-                    AlertModel().simpleAlert(vc: self, title: "Error", message: "Can't login")
-                }
+                self.showHome(result: result, error: error, provider: .basic)
             }
         }
     }
+    
+    @IBAction func SignUpWithGoogleBtnAction(_ sender: UIButton) {
+        GIDSignIn.sharedInstance.signOut()
+        signInGoogle()
+    }
+    
     
         // Metodo para esconder el Keyboard cuando se toca fuera de este
     @objc private func hideKeyboard() {
@@ -179,5 +262,38 @@ extension LogInViewController: UITextFieldDelegate {
         
     }
 
+}
+
+
+
+
+
+final class ViewModel {
+    
+    let url = URL(string: "https://api.themoviedb.org/3/trending/all/day?api_key=8aac87bc8d3173aeaac20e0e7d15f84c")
+    
+    func getMovies() {
+        
+        let session = URLSession.shared
+        
+        guard let url = url else {
+            return
+        }
+        
+        session.dataTask(with: url) { data, response, error in
+
+            if let error = error {
+                print("Ocurrio un error: \(error.localizedDescription)")
+            }
+            if let data = data, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+
+                let jsonRes = try? JSONDecoder().decode(MovieResponseDataModel.self, from: data)
+                print("Movies: \(String(describing: jsonRes?.movies.count))")
+
+            }
+        }.resume()
+        
+    }
+    
 }
 

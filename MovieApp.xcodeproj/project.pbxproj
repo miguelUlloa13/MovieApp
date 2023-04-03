@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7853F62B29DA5B5C009D511C /* MovieResponseDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7853F62A29DA5B5C009D511C /* MovieResponseDataModel.swift */; };
+		7853F62E29DAA527009D511C /* MovieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7853F62C29DAA527009D511C /* MovieCollectionViewCell.swift */; };
+		7853F62F29DAA527009D511C /* MovieCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7853F62D29DAA527009D511C /* MovieCollectionViewCell.xib */; };
 		78F339C729D11A59008FD3C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F339C629D11A59008FD3C3 /* AppDelegate.swift */; };
 		78F339C929D11A59008FD3C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F339C829D11A59008FD3C3 /* SceneDelegate.swift */; };
 		78F339CB29D11A59008FD3C3 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F339CA29D11A59008FD3C3 /* LogInViewController.swift */; };
@@ -51,6 +54,9 @@
 		057AF6BBD6688C7E7484F886 /* Pods_MovieApp_MovieAppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MovieApp_MovieAppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		30C8B52FA32ED19A89D35549 /* Pods_MovieApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MovieApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A409F38D691B58A22C45ACB /* Pods-MovieAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MovieAppTests.release.xcconfig"; path = "Target Support Files/Pods-MovieAppTests/Pods-MovieAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		7853F62A29DA5B5C009D511C /* MovieResponseDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieResponseDataModel.swift; sourceTree = "<group>"; };
+		7853F62C29DAA527009D511C /* MovieCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCollectionViewCell.swift; sourceTree = "<group>"; };
+		7853F62D29DAA527009D511C /* MovieCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MovieCollectionViewCell.xib; sourceTree = "<group>"; };
 		78F339C329D11A59008FD3C3 /* MovieApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78F339C629D11A59008FD3C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		78F339C829D11A59008FD3C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -179,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				78F339FC29D2673E008FD3C3 /* AppFontModel.swift */,
+				7853F62A29DA5B5C009D511C /* MovieResponseDataModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -190,6 +197,7 @@
 				78F339CC29D11A59008FD3C3 /* Main.storyboard */,
 				78F33A0429D39321008FD3C3 /* HomeViewController.xib */,
 				78F33A0829D3B4CE008FD3C3 /* SignUpViewController.xib */,
+				7853F62D29DAA527009D511C /* MovieCollectionViewCell.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -197,9 +205,10 @@
 		78F339FB29D11A74008FD3C3 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				78F33A0329D39321008FD3C3 /* HomeViewController.swift */,
-				78F33A0729D3B4CE008FD3C3 /* SignUpViewController.swift */,
 				78F339CA29D11A59008FD3C3 /* LogInViewController.swift */,
+				78F33A0729D3B4CE008FD3C3 /* SignUpViewController.swift */,
+				78F33A0329D39321008FD3C3 /* HomeViewController.swift */,
+				7853F62C29DAA527009D511C /* MovieCollectionViewCell.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -341,6 +350,7 @@
 				78F339D329D11A5A008FD3C3 /* Assets.xcassets in Resources */,
 				78F33A0A29D3B4CF008FD3C3 /* SignUpViewController.xib in Resources */,
 				78F339CE29D11A59008FD3C3 /* Main.storyboard in Resources */,
+				7853F62F29DAA527009D511C /* MovieCollectionViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,7 +486,9 @@
 				78F339D129D11A59008FD3C3 /* MovieApp.xcdatamodeld in Sources */,
 				78F33A0529D39321008FD3C3 /* HomeViewController.swift in Sources */,
 				78F33A0D29D67C13008FD3C3 /* Alerts.swift in Sources */,
+				7853F62E29DAA527009D511C /* MovieCollectionViewCell.swift in Sources */,
 				78F339C929D11A59008FD3C3 /* SceneDelegate.swift in Sources */,
+				7853F62B29DA5B5C009D511C /* MovieResponseDataModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -582,7 +594,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -636,7 +648,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
