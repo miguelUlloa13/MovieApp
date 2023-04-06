@@ -10,6 +10,7 @@ import FirebaseCore
 import FirebaseAnalytics
 import FirebaseAuth
 import GoogleSignIn
+import FBSDKLoginKit    // Anteriormente FacebookLogin
 
 class LogInViewController: UIViewController {
     
@@ -54,6 +55,8 @@ class LogInViewController: UIViewController {
     @IBOutlet weak var LogInBtn: UIButton!
     @IBOutlet weak var SignUpBtn: UIButton!
     @IBOutlet weak var SignUpGoogleBtn: UIButton!
+    // @IBOutlet weak var SignUpFacebookBtn: UIButton!
+    @IBOutlet weak var SignUpFacebookBtn: FBLoginButton!
     
     
     // MARK: - Properties
@@ -77,12 +80,11 @@ class LogInViewController: UIViewController {
         setUpViews()
         setUpTextFields()
         setUpButtons()
-        
 
-        let viewModel: ViewModel = ViewModel()
-        viewModel.getMovies()
-
-        
+ 
+        NetworkingProvider.shared.getMovies { results in
+            print(results.movies.count)
+        }
 
     }
     
@@ -163,6 +165,15 @@ class LogInViewController: UIViewController {
         SignUpGoogleBtn.layer.borderWidth = 1
         SignUpGoogleBtn.layer.borderColor = UIColor.black.cgColor
         SignUpGoogleBtn.round()
+        
+        SignUpFacebookBtn.setTitle("Log in using Facebook", for: .normal)
+        SignUpFacebookBtn.titleLabel?.font = .Futura(size: 17)
+        SignUpFacebookBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+        SignUpFacebookBtn.titleLabel?.minimumScaleFactor = 0.5
+        SignUpFacebookBtn.layer.borderWidth = 1
+        SignUpFacebookBtn.layer.borderColor = UIColor.link.cgColor
+        SignUpFacebookBtn.round()
+        
     }
     
     // Pasar al view controller Home
@@ -201,7 +212,8 @@ class LogInViewController: UIViewController {
         // Start the sign in flow!
         GIDSignIn.sharedInstance.signIn(withPresenting: self) { [unowned self] result, error in
           guard error == nil else {
-              fatalError("Error")
+              print("User cancelled login")
+              return
           }
 
           guard let user = result?.user,
@@ -237,6 +249,33 @@ class LogInViewController: UIViewController {
         signInGoogle()
     }
     
+ 
+    @IBAction func SignUpWithFacebookBtnAction(_ sender: UIButton) {
+        let loginManager = LoginManager()
+        loginManager.logOut()
+        loginManager.logIn(permissions: ["email"], from: self) { result, error in
+            if let error = error {
+                print("Error login with Facebook\(error.localizedDescription)")
+            }
+            
+            // Check for cancel
+            guard let result = result, !result.isCancelled else {
+                print("User cancelled login")
+                return
+            }
+
+            let token = result.token?.tokenString
+            let credential = FacebookAuthProvider.credential(withAccessToken: token ?? "Empty Token")
+            Auth.auth().signIn(with: credential) {result,error in
+                self.showHome(result: result, error: error, provider: .facebook)
+                
+            }
+        }
+        
+    }
+    
+    
+    
     
         // Metodo para esconder el Keyboard cuando se toca fuera de este
     @objc private func hideKeyboard() {
@@ -264,36 +303,4 @@ extension LogInViewController: UITextFieldDelegate {
 
 }
 
-
-
-
-
-final class ViewModel {
-    
-    let url = URL(string: "https://api.themoviedb.org/3/trending/all/day?api_key=8aac87bc8d3173aeaac20e0e7d15f84c")
-    
-    func getMovies() {
-        
-        let session = URLSession.shared
-        
-        guard let url = url else {
-            return
-        }
-        
-        session.dataTask(with: url) { data, response, error in
-
-            if let error = error {
-                print("Ocurrio un error: \(error.localizedDescription)")
-            }
-            if let data = data, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-
-                let jsonRes = try? JSONDecoder().decode(MovieResponseDataModel.self, from: data)
-                print("Movies: \(String(describing: jsonRes?.movies.count))")
-
-            }
-        }.resume()
-        
-    }
-    
-}
 

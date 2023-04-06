@@ -22,7 +22,7 @@ class AppFontModel {
      
     func applyChanges(size: CGFloat = 17, textColor: UIColor = .black, textAlignment: NSTextAlignment = .center) {
         label.text = text
-        label.font = UIFont(name: "Futura", size: size)
+        label.font = .Futura(size: size)
         label.textColor = textColor
         label.textAlignment = textAlignment
         label.numberOfLines = 0

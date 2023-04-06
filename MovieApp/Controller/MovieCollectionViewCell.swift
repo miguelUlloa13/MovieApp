@@ -27,6 +27,11 @@ class MovieCollectionViewCell: UICollectionViewCell {
         super.awakeFromNib()
         
         MovieCVCView.layer.cornerRadius = 20
+        MovieCVCView.layer.borderColor = UIColor.link.cgColor
+        MovieCVCView.layer.borderWidth = 1
+        MovieCVCView.backgroundColor = .systemGray6.withAlphaComponent(0.7)
+        ReleaseAndRateView.backgroundColor = .clear
+        
         setUpImage()
         setUpLabels()
         
@@ -50,19 +55,19 @@ class MovieCollectionViewCell: UICollectionViewCell {
         MovieTitleLbl.textColor = .link
         
         // Fecha de lanzamiento
-        MovieReleaseDateLbl.font = .Futura(size: 17)
+        MovieReleaseDateLbl.font = .Futura(size: 16)
         MovieReleaseDateLbl.numberOfLines = 0
-        MovieReleaseDateLbl.textAlignment = .left
+        MovieReleaseDateLbl.textAlignment = .center
         MovieReleaseDateLbl.textColor = .link
         
         // Valoracion de la pelicula
-        MovieRateLbl.font = .Futura(size: 17)
+        MovieRateLbl.font = .Futura(size: 16)
         MovieRateLbl.numberOfLines = 0
         MovieRateLbl.textAlignment = .left
         MovieRateLbl.textColor = .link
         
         // Descripcion
-        MovieOverviewLbl.font = .Futura(size: 17)
+        MovieOverviewLbl.font = .Futura(size: 14)
         MovieOverviewLbl.numberOfLines = 0
         MovieOverviewLbl.textAlignment = .left
         MovieOverviewLbl.textColor = .black

@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 
 class AlertModel {
+    // Metodo para hacer alertas
     func simpleAlert(vc: UIViewController, title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "Accept", style: .default, handler: nil)

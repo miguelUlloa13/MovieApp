@@ -8,11 +8,13 @@
 import UIKit
 import FirebaseAuth
 import GoogleSignIn
+import FBSDKLoginKit
     
     // enum con los proveedores de registro en la aplicacion
 enum ProviderType: String {
     case basic
     case google
+    case facebook
 }
 
 class HomeViewController: UIViewController {
@@ -46,7 +48,11 @@ class HomeViewController: UIViewController {
     private let defaults = UserDefaults.standard // Singleton de user default
     
     lazy var rowsToDisplay = ChaletOne  // Indicador del pabellon a desplegar
+    private let cellSizeWitdh = UIScreen.main.bounds.width / 2
     
+    var movies = [MovieDataModel]()
+    
+
     let SegmControlValues = ["Popular", "Top Rated", "New Releases"]
     let ChaletOne = ["Empresa 1 Chalet 1", "Empresa 2 Chalet 1", "Empresa 3 Chalet 1"]
     
@@ -63,6 +69,8 @@ class HomeViewController: UIViewController {
     // MARK: - View Life Cycle Method
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+
 
         self.title = "HOME"
         self.navigationItem.setHidesBackButton(true, animated: false)   // Metodo para esconder el back button del nav bar
@@ -70,13 +78,22 @@ class HomeViewController: UIViewController {
         // Delegados del collection view
         MovieCollectionView.delegate = self
         MovieCollectionView.dataSource = self
-        MovieCollectionView.register(UINib(nibName: "StaticExhibitionCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "StaticExhibitionCell")
+        MovieCollectionView.register(UINib(nibName: "MovieCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "MovieCell")
         
 
         saveUserCredentials()
         setUpSegmentedControl()
         setUpLabels()
         setUpButtons()
+        
+        
+        NetworkingProvider.shared.getMovies { results in
+            self.movies = results.movies
+            DispatchQueue.main.async {
+                self.MovieCollectionView.reloadData()
+            }
+        }
+        
     }
 
 
@@ -141,8 +158,11 @@ class HomeViewController: UIViewController {
                 
         case .google:   // El logout de email y google es el mismo
             GIDSignIn.sharedInstance.signOut()
-
             
+        case .facebook:
+            LoginManager().logOut()
+            firebaseLogOut()
+
         }
         navigationController?.popViewController(animated: true)
     }
@@ -150,30 +170,34 @@ class HomeViewController: UIViewController {
 }
 
 
-extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return movies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
          
-         let cell = MovieCollectionView.dequeueReusableCell(withReuseIdentifier: "MovieCell", for: indexPath) as? MovieCollectionViewCell
-         /*
-         cell?.StaticExhibitionCVCellImage.image = UIImage(named: Block1ArrayImgs[indexPath.row])
-         cell?.StaticExhibitionCVCellTitleLbl.text =  NombreAvion[indexPath.row]
-         cell?.StaticExhibitionCVCellDescriptionLbl.text =  DescripcionAvion
-         */
-         let bgColorView = UIView()
+        let cell = MovieCollectionView.dequeueReusableCell(withReuseIdentifier: "MovieCell", for: indexPath) as? MovieCollectionViewCell
+
+        
+        cell?.MovieTitleLbl.text = movies[indexPath.row].title
+        cell?.MovieOverviewLbl.text = movies[indexPath.row].overview
+        cell?.MovieReleaseDateLbl.text = movies[indexPath.row].releaseDate
+        cell?.MovieRateLbl.text = String(movies[indexPath.row].score ?? 0.0)
+        
+        let baseUrl = "https://image.tmdb.org/t/p/original/"
+        let completUrl = baseUrl + (movies[indexPath.row].image ?? "noImage")
+        cell?.MovieImg.downloaded(from: completUrl, contentMode: .scaleAspectFill)
          
-         bgColorView.backgroundColor = UIColor.white.withAlphaComponent(0.2)
-         cell?.selectedBackgroundView = bgColorView
-         
-         cell?.layer.cornerRadius = 20
-         
-         return cell!
+        return cell!
 
     }
     
-    
+    // tamaño de la celda
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        return CGSize(width: cellSizeWitdh, height: 430)
+        
+    }
 }

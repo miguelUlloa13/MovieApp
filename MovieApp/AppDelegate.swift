@@ -10,6 +10,7 @@ import CoreData
 import IQKeyboardManagerSwift
 import GoogleSignIn
 import FirebaseCore
+import FBSDKCoreKit // Anteriormente FacebookCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,17 +25,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: - Firebase y GoogleSignIn -
         FirebaseApp.configure()
         
-        
+        // MARK: - Facebook -
+        ApplicationDelegate.shared.application(
+            application,
+            didFinishLaunchingWithOptions: launchOptions
+        )
         
         return true
     }
+    
     
     // MARK: - GoogleSignIn -
     func application(_ app: UIApplication,
                      open url: URL,
                      options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-      return GIDSignIn.sharedInstance.handle(url) 
+        
+        // MARK: - Firebase y GoogleSignIn -
+      return GIDSignIn.sharedInstance.handle(url)
+        
+        // MARK: - Facebook -
+        ||  ApplicationDelegate.shared.application(app, open: url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+        )
+        
     }
+    
 
     // MARK: UISceneSession Lifecycle
 
